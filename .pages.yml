@@ -4,25 +4,22 @@ media:
   categories: [ "image" ]
 content:
   - name: posts
-    label: Posts
+    label: 文章
     type: collection
     path: _posts
+    # 一天一篇：文件名就是日期，比如 2026-10-16.md
+    filename: "{fields.date}.md"
     view:
-      fields: [ coverImage, title, date ]
+      fields: [ title, date ]
     fields:
-      - { name: title, label: Title, type: string, required: true }
-      - { name: excerpt, label: Excerpt, type: string }
-      - { name: coverImage, label: Cover image, type: image }
-      - { name: date, label: Date, type: date, options: { time: true, format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" } }
-      - name: author
-        label: Author
-        type: object
-        fields:
-          - { name: name, label: Name, type: string }
-          - { name: picture, label: Picture, type: image }
-      - name: ogImage
-        label: Image (social sharing)
-        type: object
-        fields:
-          - { name: url, label: URL, type: image }
-      - { name: body, label: Body, type: rich-text }
+      - { name: title, label: 标题, type: string, required: true }
+      - { name: date, label: 日期, type: date, required: true, options: { format: "yyyy-MM-dd" } }
+      - { name: excerpt, label: 摘要（可不填，默认取正文第一段）, type: text }
+      - { name: body, label: 正文, type: rich-text, options: { format: markdown } }
+  - name: about
+    label: 关于
+    type: file
+    path: _pages/about.md
+    fields:
+      - { name: title, label: 标题, type: string }
+      - { name: body, label: 正文, type: rich-text, options: { format: markdown } }

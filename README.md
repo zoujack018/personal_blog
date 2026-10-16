@@ -1,63 +1,55 @@
-# A statically generated blog example using Next.js, Markdown, and TypeScript
+# Compound
 
-This is the existing [blog-starter](https://github.com/vercel/next.js/tree/canary/examples/blog-starter) plus TypeScript.
+一本每天翻一页的日历式博客：https://zoujack018.us.ci
 
-This example showcases Next.js's [Static Generation](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) feature using Markdown files as the data source.
+Next.js 静态导出，推送到 `main` 之后由 Cloudflare 自动构建、上线。
 
-The blog posts are stored in `/_posts` as Markdown files with front matter support. Adding a new Markdown file in there will create a new blog post.
+## 写一篇文章
 
-To create the blog posts we use [`remark`](https://github.com/remarkjs/remark) and [`remark-html`](https://github.com/remarkjs/remark-html) to convert the Markdown files into an HTML string, and then send it down as a prop to the page. The metadata of every post is handled by [`gray-matter`](https://github.com/jonschlinkert/gray-matter) and also sent in props to the page.
+在 `_posts/` 里新建一个以日期命名的文件，比如 `2026-10-16.md`，一天一篇：
 
-## Demo
+```markdown
+---
+title: 标题
+date: 2026-10-16
+excerpt: 一两句摘要。可以不写，不写就取正文第一段
+---
 
-[https://next-blog-starter.vercel.app/](https://next-blog-starter.vercel.app/)
+正文用 Markdown，支持表格和脚注[^1]。
 
-## Deploy your own
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/blog-starter)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/blog-starter&project-name=blog-starter&repository-name=blog-starter)
-
-### Related examples
-
-- [WordPress](/examples/cms-wordpress)
-- [DatoCMS](/examples/cms-datocms)
-- [Sanity](/examples/cms-sanity)
-- [TakeShape](/examples/cms-takeshape)
-- [Prismic](/examples/cms-prismic)
-- [Contentful](/examples/cms-contentful)
-- [Strapi](/examples/cms-strapi)
-- [Agility CMS](/examples/cms-agilitycms)
-- [Cosmic](/examples/cms-cosmic)
-- [ButterCMS](/examples/cms-buttercms)
-- [Storyblok](/examples/cms-storyblok)
-- [GraphCMS](/examples/cms-graphcms)
-- [Kontent](/examples/cms-kontent)
-- [Umbraco Heartcore](/examples/cms-umbraco-heartcore)
-- [Builder.io](/examples/cms-builder-io)
-- [TinaCMS](/examples/cms-tina/)
-- [Enterspeed](/examples/cms-enterspeed)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
-
-```bash
-npx create-next-app --example blog-starter blog-starter-app
+[^1]: 出处写在这里。
 ```
 
-```bash
-yarn create next-app --example blog-starter blog-starter-app
-```
+- 日期决定文章在日历上的位置和网址（`/2026/10/16/`）。同一天放两篇，构建会直接报错。
+- 也可以在 [Pages CMS](https://app.pagescms.org) 里写，字段按 `.pages.yml` 显示。
+- 图片放在 `public/assets/`，文中写 `/assets/文件名`。
+- 中文里的引号用“”，不要用英文直引号。
+
+## 页面
+
+| 地址 | 内容 |
+|---|---|
+| `/` | 最新一篇，下面是往日列表 |
+| `/calendar/`、`/2026/10/` | 月历：有文章的日子写着标题，每格带农历、节气和节日 |
+| `/2026/10/16/` | 文章 |
+| `/archive/` | 归档 |
+| `/about/` | 关于，内容在 `_pages/about.md` |
+| `/feed.xml` | RSS |
+
+- 站点名称、标语、是否允许搜索引擎收录：`src/lib/site.ts`
+- 配色和排版：`src/app/globals.css` 顶部的变量，深色模式跟随系统
+- 图标：改 `public/favicon.svg` 或 `scripts/icons/touch-icon.svg`，再运行 `scripts/icons/make-icons.sh`
+
+## 本地预览
 
 ```bash
-pnpm create next-app --example blog-starter blog-starter-app
+npm install
+npm run build
+python3 -m http.server 4321 --directory out
 ```
 
-Your blog should be up and running on [http://localhost:3000](http://localhost:3000)! If it doesn't work, post on [GitHub discussions](https://github.com/vercel/next.js/discussions).
+然后打开 http://localhost:4321 。
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+## 部署
 
-# Notes
-
-`blog-starter` uses [Tailwind CSS](https://tailwindcss.com) [(v3.0)](https://tailwindcss.com/blog/tailwindcss-v3).
+推送到 `main` 即可。Cloudflare 按项目里配置的构建命令生成 `out/`，再把它作为静态资源发布（见 `wrangler.jsonc`）。构建用的 Node 版本固定在 `.node-version`。

@@ -1,63 +1,61 @@
-import Footer from "@/app/_components/footer";
-import { CMS_NAME, HOME_OG_IMAGE_URL } from "@/lib/constants";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Today } from "@/components/Today";
+import { SITE } from "@/lib/site";
+import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: `Next.js Blog Example with ${CMS_NAME}`,
-  description: `A statically generated blog example using Next.js and ${CMS_NAME}.`,
-  openGraph: {
-    images: [HOME_OG_IMAGE_URL],
+  metadataBase: new URL(SITE.url),
+  title: { default: SITE.title, template: `%s · ${SITE.title}` },
+  description: SITE.tagline,
+  robots: SITE.indexable ? undefined : { index: false, follow: false },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
+  alternates: { types: { "application/rss+xml": "/feed.xml" } },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf8f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#161513" },
+  ],
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/favicon/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
-        <link
-          rel="mask-icon"
-          href="/favicon/safari-pinned-tab.svg"
-          color="#000000"
-        />
-        <link rel="shortcut icon" href="/favicon/favicon.ico" />
-        <meta name="msapplication-TileColor" content="#000000" />
-        <meta
-          name="msapplication-config"
-          content="/favicon/browserconfig.xml"
-        />
-        <meta name="theme-color" content="#000" />
-        <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
-      </head>
-      <body className={inter.className}>
-        <div className="min-h-screen">{children}</div>
-        <Footer />
+    <html lang="zh-CN">
+      <body>
+        <a className="skip" href="#main">
+          跳到正文
+        </a>
+        <header className="site-header">
+          <div className="wrap bar">
+            <div className="brand">
+              <a className="brand-title" href="/">
+                {SITE.title}
+              </a>
+              <p className="brand-tagline">{SITE.tagline}</p>
+            </div>
+            <Today />
+          </div>
+        </header>
+
+        {children}
+
+        <footer className="site-footer">
+          <div className="wrap">
+            <span>
+              © {new Date().getFullYear()} {SITE.title}
+            </span>
+            <a href="/feed.xml">RSS 订阅</a>
+          </div>
+        </footer>
       </body>
     </html>
   );
