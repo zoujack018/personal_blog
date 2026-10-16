@@ -16,6 +16,8 @@ export type Post = {
   /** "/2026/10/16/" */
   url: string;
   readingMinutes: number;
+  /** 汉字数加英文词数，文档页状态栏用 */
+  words: number;
 };
 
 const POSTS_DIR = path.join(process.cwd(), "_posts");
@@ -24,7 +26,8 @@ let cache: Post[] | null = null;
 
 /** 全部文章，新的在前 */
 export function getAllPosts(): Post[] {
-  if (cache) return cache;
+  // 本地预览时每次都重新读，新放进去的文章马上能看到
+  if (cache && process.env.NODE_ENV === "production") return cache;
   const files = fs.existsSync(POSTS_DIR) ? fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md")) : [];
   const seen = new Map<string, string>();
   const posts = files.map((file) => {
@@ -44,6 +47,7 @@ export function getAllPosts(): Post[] {
       content,
       url: `/${year}/${month}/${day}/`,
       readingMinutes: readingMinutes(content),
+      words: wordCount(content),
     };
   });
   cache = posts.sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -71,31 +75,16 @@ export function getPostsByMonth() {
   return map;
 }
 
-/** 有日历页的月份，从第一篇所在月到本月（含），从早到晚 */
+/** 看板有页面的月份：从第一篇所在月到本月（含），从早到晚。一篇都没有时只有本月 */
 export function getMonthRange(): string[] {
   const posts = getAllPosts();
   const now = todayUtc().slice(0, 7);
-  if (posts.length === 0) return [now];
-  const first = posts[posts.length - 1].date.slice(0, 7);
-  const last = posts[0].date.slice(0, 7) > now ? posts[0].date.slice(0, 7) : now;
+  const first = posts.length > 0 ? posts[posts.length - 1].date.slice(0, 7) : now;
+  const latest = posts.length > 0 ? posts[0].date.slice(0, 7) : now;
+  const last = latest > now ? latest : now;
   const months: string[] = [];
-  for (let m = first; m <= last; m = addMonths(m, 1)) months.push(m);
+  for (let m = first < now ? first : now; m <= last; m = addMonths(m, 1)) months.push(m);
   return months;
-}
-
-/** 截至最新一篇，连续写了几天 */
-export function getStreak() {
-  const posts = getAllPosts();
-  let streak = 0;
-  let expected = posts[0]?.date;
-  for (const p of posts) {
-    if (p.date !== expected) break;
-    streak++;
-    const t = new Date(`${p.date}T00:00:00Z`);
-    t.setUTCDate(t.getUTCDate() - 1);
-    expected = t.toISOString().slice(0, 10);
-  }
-  return streak;
 }
 
 function normalizeDate(value: unknown, file: string) {
@@ -125,9 +114,20 @@ function makeExcerpt(markdown: string) {
   return text.length > 110 ? `${text.slice(0, 110)}…` : text;
 }
 
-function readingMinutes(markdown: string) {
+function countText(markdown: string) {
   const text = plainText(markdown);
   const han = (text.match(/\p{Script=Han}/gu) ?? []).length;
   const words = (text.replace(/\p{Script=Han}/gu, " ").match(/[A-Za-z0-9]+/g) ?? []).length;
+  return { han, words };
+}
+
+function readingMinutes(markdown: string) {
+  const { han, words } = countText(markdown);
   return Math.max(1, Math.round(han / 400 + words / 220));
+}
+
+/** 文档页状态栏里的字数：汉字数加英文词数 */
+export function wordCount(markdown: string) {
+  const { han, words } = countText(markdown);
+  return han + words;
 }

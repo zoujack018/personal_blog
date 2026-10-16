@@ -1,23 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <style>
-    .paper { fill: #faf8f4 } .edge { fill: none; stroke: #1f1d1a } .band, .now { fill: #b4442c } .hole { fill: #faf8f4 } .day { fill: #cfc8bd }
-    @media (prefers-color-scheme: dark) {
-      .paper, .hole { fill: #1f1d1a } .edge { stroke: #ece8e1 } .band, .now { fill: #e07a5f } .day { fill: #57524b }
-    }
+    .note { fill: #0a0a0a } .fold { fill: #8a8a8a }
+    @media (prefers-color-scheme: dark) { .note { fill: #fafafa } }
   </style>
-  <rect class="paper" x="7" y="9" width="50" height="48" rx="10"/>
-  <path class="band" d="M7 22V19A10 10 0 0 1 17 9H47A10 10 0 0 1 57 19V22Z"/>
-  <circle class="hole" cx="20" cy="15.5" r="2.5"/>
-  <circle class="hole" cx="44" cy="15.5" r="2.5"/>
-  <rect class="day" x="14" y="28" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="24" y="28" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="34" y="28" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="44" y="28" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="14" y="37" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="24" y="37" width="6" height="6" rx="1.5"/>
-  <rect class="now" x="34" y="37" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="44" y="37" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="14" y="46" width="6" height="6" rx="1.5"/>
-  <rect class="day" x="24" y="46" width="6" height="6" rx="1.5"/>
-  <rect class="edge" x="7" y="9" width="50" height="48" rx="10" stroke-width="3"/>
+  <!-- 一张右下角折起来的便利贴 -->
+  <path class="note" d="M9 9h46v32L41 55H9z"/>
+  <path class="fold" d="M55 41H44a3 3 0 0 0-3 3v11z"/>
 </svg>

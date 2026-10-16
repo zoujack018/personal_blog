@@ -1,7 +1,8 @@
-import { Today } from "@/components/Today";
 import { SITE } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 
+// Inter 自托管，带光学尺寸轴：大标题自动用更紧的显示字形
+import "@fontsource-variable/inter/opsz.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,41 +23,16 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#161513" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
 };
 
+// 外框只有 html 和 body：看板页带边栏（见 (board)/layout.tsx），文档页自带工具栏
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body>
-        <a className="skip" href="#main">
-          跳到正文
-        </a>
-        <header className="site-header">
-          <div className="wrap bar">
-            <div className="brand">
-              <a className="brand-title" href="/">
-                {SITE.title}
-              </a>
-              <p className="brand-tagline">{SITE.tagline}</p>
-            </div>
-            <Today />
-          </div>
-        </header>
-
-        {children}
-
-        <footer className="site-footer">
-          <div className="wrap">
-            <span>
-              © {new Date().getFullYear()} {SITE.title}
-            </span>
-            <a href="/feed.xml">RSS 订阅</a>
-          </div>
-        </footer>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
